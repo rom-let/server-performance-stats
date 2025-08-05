@@ -17,12 +17,20 @@ memory(){
 	local usedpercent=$(echo "${usedunit} * 100.0 / ${totalunit}" | bc)
 	local freepercent=$(echo "${freeunit} * 100.0 / ${totalunit}" | bc)
 	cat << EOF
-
+memory usage	:	${used}	/	${total}	(${free}	free)
+	in %	:	${usedpercent}%	/ 	100%	(${freepercent}%	free)
 ----
-memory usage :	${used}	/	${total}	(${free}	free)
-	in % :	${usedpercent}%	/ 	100%	(${freepercent}%	free)
----
 EOF
 }
 
+cpu(){
+	local usage=$(top -bn1 | awk 'FNR == 3 {print $8}')
+	cat << EOFF
+CPU usage	:	$(echo "100.0 - ${usage}" | bc)%	/	100%	(${usage}%	free)
+----
+EOFF
+
+}
+echo "----"
 memory
+cpu

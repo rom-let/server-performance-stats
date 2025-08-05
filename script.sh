@@ -20,7 +20,7 @@ memory(){
 
 ----
 memory usage :	${used}	/	${total}	(${free}	free)
-in % :		${usedpercent}% / 	100%	(${freepercent}%	free)
+	in % :	${usedpercent}%	/ 	100%	(${freepercent}%	free)
 ---
 EOF
 }

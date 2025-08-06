@@ -1,9 +1,5 @@
 #! /bin/bash
 
-#memory=`free -h`
-
-#echo $memory
-
 memory(){
 	local used=$(free -h | awk 'FNR == 2 {print $3}')
 	local total=$(free -h | awk 'FNR == 2 {print $2}')
@@ -18,7 +14,7 @@ memory(){
 	local freepercent=$(echo "${freeunit} * 100.0 / ${totalunit}" | bc)
 	cat << EOF
 memory usage	:	${used}	/	${total}	(${free}	free)
-	in %	:	${usedpercent}%	/ 	100%	(${freepercent}%	free)
+        in %	:	${usedpercent}%	/ 	100%	(${freepercent}%	free)
 ----
 EOF
 }
@@ -32,5 +28,20 @@ EOFF
 
 }
 echo "----"
-memory
+
+disk(){
+	local total=$(df -h --total | awk '/total/ {print $2}')
+	local used=$(df -h --total | awk '/total/ {print $3}')
+	local free=$(df -h --total | awk '/total/ {print $4}')
+	local percent=$(df -h --total | awk '/total/ {print $5}' | sed 's/[^0-9]*//g')
+	cat << EOFFF
+Disk usage	:	${used}	/	${total}	(${free}	free)
+      in %	:	${percent}%	/ 	100%	($(echo "100.0 - ${percent}" | bc)%	free))
+----
+EOFFF
+}
+
 cpu
+memory
+disk
+

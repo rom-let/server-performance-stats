@@ -12,19 +12,19 @@ memory(){
 	local freeunit=$(echo ${free} | sed 's/[a-z]*[A-Z]*//g')
 	local usedpercent=$(echo "${usedunit} * 100.0 / ${totalunit}" | bc)
 	local freepercent=$(echo "${freeunit} * 100.0 / ${totalunit}" | bc)
-	cat << EOF
+	cat << EOFMEM
 memory usage	:	${used}	/	${total}	(${free}	free)
         in %	:	${usedpercent}%	/ 	100%	(${freepercent}%	free)
 ----
-EOF
+EOFMEM
 }
 
 cpu(){
 	local usage=$(top -bn1 | awk 'FNR == 3 {print $8}')
-	cat << EOFF
+	cat << EOFCPU
 CPU usage	:	$(echo "100.0 - ${usage}" | bc)%	/	100%	(${usage}%	free)
 ----
-EOFF
+EOFCPU
 
 }
 echo "----"
@@ -34,14 +34,32 @@ disk(){
 	local used=$(df -h --total | awk '/total/ {print $3}')
 	local free=$(df -h --total | awk '/total/ {print $4}')
 	local percent=$(df -h --total | awk '/total/ {print $5}' | sed 's/[^0-9]*//g')
-	cat << EOFFF
+	cat << EOFDISK
 Disk usage	:	${used}	/	${total}	(${free}	free)
       in %	:	${percent}%	/ 	100%	($(echo "100.0 - ${percent}" | bc)%	free))
 ----
-EOFFF
+EOFDISK
 }
 
+topcpu(){
+  local raw=$(top -bn 1 -o %CPU | head -n 12 | tail -n 5 | awk '{print $1}' )
+  cat << EOFTOPCPU
+Top 5 process by CPU usage:
+${raw}
+----
+EOFTOPCPU
+}
+
+topmemory(){
+  local raw=$(top -bn 1 -o %MEM | head -n 12 | tail -n 5 | awk '{print $1}' )
+  cat << EOFTOPMEM
+Top 5 process by memory usage:
+${raw}
+----
+EOFTOPMEM
+}
 cpu
 memory
 disk
-
+topcpu
+topmemory
